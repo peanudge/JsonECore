@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JsonECore.Cli/JsonECore.Cli.csproj" />
+    <Project Path="src/JsonECore/JsonECore.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JsonECore.Tests/JsonECore.Tests.csproj" />
+  </Folder>
+</Solution>
