@@ -22,3 +22,6 @@ TestResults/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Claude AI files
+.claude/**
