@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Expressions.Ast;
 
@@ -23,18 +24,14 @@ public class SliceExpression : IExpression
     {
         var obj = Object.Evaluate(context);
 
-        int? startIdx = Start != null ? (int)Start.Evaluate(context).GetDouble() : null;
-        int? endIdx = End != null ? (int)End.Evaluate(context).GetDouble() : null;
+        int? startIdx = Start != null ? GetInt(Start.Evaluate(context)) : null;
+        int? endIdx = End != null ? GetInt(End.Evaluate(context)) : null;
 
-        if (obj.ValueKind == JsonValueKind.Array)
-        {
+        if (IsArray(obj))
             return SliceArray(obj, startIdx, endIdx);
-        }
 
-        if (obj.ValueKind == JsonValueKind.String)
-        {
+        if (IsString(obj))
             return SliceString(obj.GetString()!, startIdx, endIdx);
-        }
 
         throw new JsonEException(JsonEErrorCodes.TypeMismatch, "Cannot slice non-sliceable value", "array/string", GetTypeName(obj));
     }
@@ -46,23 +43,15 @@ public class SliceExpression : IExpression
 
         var result = new List<JsonElement>();
         for (int i = startIdx; i < endIdx; i++)
-        {
             result.Add(array[i].Clone());
-        }
 
         return CreateArray(result);
     }
 
     private static JsonElement SliceString(string str, int? start, int? end)
     {
-        var length = str.Length;
-        var (startIdx, endIdx) = NormalizeSliceIndices(start, end, length);
-
-        if (startIdx >= endIdx)
-        {
-            return CreateString("");
-        }
-
+        var (startIdx, endIdx) = NormalizeSliceIndices(start, end, str.Length);
+        if (startIdx >= endIdx) return CreateString("");
         return CreateString(str.Substring(startIdx, endIdx - startIdx));
     }
 
@@ -71,46 +60,13 @@ public class SliceExpression : IExpression
         var startIdx = start ?? 0;
         var endIdx = end ?? length;
 
-        // Handle negative indices
         if (startIdx < 0) startIdx = Math.Max(0, length + startIdx);
         if (endIdx < 0) endIdx = Math.Max(0, length + endIdx);
 
-        // Clamp to valid range
         startIdx = Math.Min(startIdx, length);
         endIdx = Math.Min(endIdx, length);
-
-        // Ensure start <= end
         if (startIdx > endIdx) startIdx = endIdx;
 
         return (startIdx, endIdx);
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
-    }
-
-    private static JsonElement CreateString(string value)
-    {
-        var json = JsonSerializer.Serialize(value);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static JsonElement CreateArray(List<JsonElement> items)
-    {
-        var json = JsonSerializer.Serialize(items);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
     }
 }

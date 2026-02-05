@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Functions;
 
@@ -8,35 +9,13 @@ namespace JsonECore.Functions;
 /// </summary>
 public static class MathFunctions
 {
-    private static JsonElement CreateNumber(double value)
-    {
-        var json = JsonSerializer.Serialize(value);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static double GetNumber(JsonElement value, string funcName)
+    private static double GetNumberArg(JsonElement value, string funcName)
     {
         if (value.ValueKind != JsonValueKind.Number)
         {
             throw new JsonEException(JsonEErrorCodes.TypeMismatch, $"{funcName}() requires number arguments", "number", GetTypeName(value));
         }
         return value.GetDouble();
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
     }
 
     public class MinFunction : IBuiltInFunction
@@ -53,7 +32,7 @@ public static class MathFunctions
             double minValue = double.PositiveInfinity;
             foreach (var arg in args)
             {
-                var value = GetNumber(arg, Name);
+                var value = GetNumberArg(arg, Name);
                 if (value < minValue)
                 {
                     minValue = value;
@@ -78,7 +57,7 @@ public static class MathFunctions
             double maxValue = double.NegativeInfinity;
             foreach (var arg in args)
             {
-                var value = GetNumber(arg, Name);
+                var value = GetNumberArg(arg, Name);
                 if (value > maxValue)
                 {
                     maxValue = value;
@@ -100,7 +79,7 @@ public static class MathFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "sqrt() requires exactly one argument", Name);
             }
 
-            var value = GetNumber(args[0], Name);
+            var value = GetNumberArg(args[0], Name);
             return CreateNumber(Math.Sqrt(value));
         }
     }
@@ -116,7 +95,7 @@ public static class MathFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "ceil() requires exactly one argument", Name);
             }
 
-            var value = GetNumber(args[0], Name);
+            var value = GetNumberArg(args[0], Name);
             return CreateNumber(Math.Ceiling(value));
         }
     }
@@ -132,7 +111,7 @@ public static class MathFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "floor() requires exactly one argument", Name);
             }
 
-            var value = GetNumber(args[0], Name);
+            var value = GetNumberArg(args[0], Name);
             return CreateNumber(Math.Floor(value));
         }
     }
@@ -148,7 +127,7 @@ public static class MathFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "abs() requires exactly one argument", Name);
             }
 
-            var value = GetNumber(args[0], Name);
+            var value = GetNumberArg(args[0], Name);
             return CreateNumber(Math.Abs(value));
         }
     }

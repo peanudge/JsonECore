@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Expressions.Ast;
 
@@ -17,14 +18,7 @@ public class ArrayExpression : IExpression
 
     public JsonElement Evaluate(EvaluationContext context)
     {
-        var result = new List<JsonElement>();
-        foreach (var element in Elements)
-        {
-            result.Add(element.Evaluate(context).Clone());
-        }
-
-        var json = JsonSerializer.Serialize(result);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
+        var result = Elements.Select(e => e.Evaluate(context).Clone());
+        return CreateArray(result);
     }
 }

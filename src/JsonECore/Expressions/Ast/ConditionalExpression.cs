@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Expressions.Ast;
 
@@ -21,31 +22,8 @@ public class ConditionalExpression : IExpression
 
     public JsonElement Evaluate(EvaluationContext context)
     {
-        var conditionResult = Condition.Evaluate(context);
-
-        if (IsTruthy(conditionResult))
-        {
-            return TrueExpression.Evaluate(context);
-        }
-        else
-        {
-            return FalseExpression.Evaluate(context);
-        }
-    }
-
-    private static bool IsTruthy(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.True => true,
-            JsonValueKind.False => false,
-            JsonValueKind.Null => false,
-            JsonValueKind.Undefined => false,
-            JsonValueKind.Number => value.GetDouble() != 0,
-            JsonValueKind.String => !string.IsNullOrEmpty(value.GetString()),
-            JsonValueKind.Array => value.GetArrayLength() > 0,
-            JsonValueKind.Object => true,
-            _ => false
-        };
+        return IsTruthy(Condition.Evaluate(context))
+            ? TrueExpression.Evaluate(context)
+            : FalseExpression.Evaluate(context);
     }
 }

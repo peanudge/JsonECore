@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Functions;
 
@@ -8,42 +9,13 @@ namespace JsonECore.Functions;
 /// </summary>
 public static class StringFunctions
 {
-    private static JsonElement CreateString(string value)
-    {
-        var json = JsonSerializer.Serialize(value);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static JsonElement CreateArray(List<string> items)
-    {
-        var json = JsonSerializer.Serialize(items);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static string GetString(JsonElement value, string funcName)
+    private static string GetStringArg(JsonElement value, string funcName)
     {
         if (value.ValueKind != JsonValueKind.String)
         {
             throw new JsonEException(JsonEErrorCodes.TypeMismatch, $"{funcName}() requires string argument", "string", GetTypeName(value));
         }
         return value.GetString()!;
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
     }
 
     public class LowercaseFunction : IBuiltInFunction
@@ -57,7 +29,7 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "lowercase() requires exactly one argument", Name);
             }
 
-            var str = GetString(args[0], Name);
+            var str = GetStringArg(args[0], Name);
             return CreateString(str.ToLowerInvariant());
         }
     }
@@ -73,7 +45,7 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "uppercase() requires exactly one argument", Name);
             }
 
-            var str = GetString(args[0], Name);
+            var str = GetStringArg(args[0], Name);
             return CreateString(str.ToUpperInvariant());
         }
     }
@@ -89,7 +61,7 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "strip() requires exactly one argument", Name);
             }
 
-            var str = GetString(args[0], Name);
+            var str = GetStringArg(args[0], Name);
             return CreateString(str.Trim());
         }
     }
@@ -105,7 +77,7 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "lstrip() requires exactly one argument", Name);
             }
 
-            var str = GetString(args[0], Name);
+            var str = GetStringArg(args[0], Name);
             return CreateString(str.TrimStart());
         }
     }
@@ -121,7 +93,7 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "rstrip() requires exactly one argument", Name);
             }
 
-            var str = GetString(args[0], Name);
+            var str = GetStringArg(args[0], Name);
             return CreateString(str.TrimEnd());
         }
     }
@@ -137,8 +109,8 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.InvalidFunctionCall, "split() requires exactly two arguments", Name);
             }
 
-            var str = GetString(args[0], Name);
-            var delimiter = GetString(args[1], Name);
+            var str = GetStringArg(args[0], Name);
+            var delimiter = GetStringArg(args[1], Name);
             var parts = str.Split(delimiter);
             return CreateArray(parts.ToList());
         }
@@ -160,7 +132,7 @@ public static class StringFunctions
                 throw new JsonEException(JsonEErrorCodes.TypeMismatch, "join() first argument must be an array", "array", GetTypeName(args[0]));
             }
 
-            var separator = GetString(args[1], Name);
+            var separator = GetStringArg(args[1], Name);
             var items = new List<string>();
             foreach (var item in args[0].EnumerateArray())
             {
@@ -168,28 +140,6 @@ public static class StringFunctions
             }
 
             return CreateString(string.Join(separator, items));
-        }
-
-        private static string ConvertToString(JsonElement value)
-        {
-            return value.ValueKind switch
-            {
-                JsonValueKind.String => value.GetString() ?? "",
-                JsonValueKind.Number => FormatNumber(value.GetDouble()),
-                JsonValueKind.True => "true",
-                JsonValueKind.False => "false",
-                JsonValueKind.Null => "null",
-                _ => value.GetRawText()
-            };
-        }
-
-        private static string FormatNumber(double value)
-        {
-            if (value == Math.Truncate(value) && !double.IsInfinity(value))
-            {
-                return ((long)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
-            }
-            return value.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Operators;
 
@@ -77,33 +78,5 @@ public class MergeDeepOperator : IOperator
         }
 
         return CreateObject(result);
-    }
-
-    private static JsonElement CreateObject(Dictionary<string, JsonElement> properties)
-    {
-        var json = JsonSerializer.Serialize(properties);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static JsonElement CreateEmptyObject()
-    {
-        using var doc = JsonDocument.Parse("{}");
-        return doc.RootElement.Clone();
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
     }
 }

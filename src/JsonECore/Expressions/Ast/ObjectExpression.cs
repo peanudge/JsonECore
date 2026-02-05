@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Expressions.Ast;
 
@@ -21,31 +22,10 @@ public class ObjectExpression : IExpression
         foreach (var (keyExpr, valueExpr) in Properties)
         {
             var key = keyExpr.Evaluate(context);
-            if (key.ValueKind != JsonValueKind.String)
-            {
+            if (!IsString(key))
                 throw new JsonEException(JsonEErrorCodes.TypeMismatch, "Object key must be a string", "string", GetTypeName(key));
-            }
-            var value = valueExpr.Evaluate(context);
-            result[key.GetString()!] = value.Clone();
+            result[key.GetString()!] = valueExpr.Evaluate(context).Clone();
         }
-
-        var json = JsonSerializer.Serialize(result);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
+        return CreateObject(result);
     }
 }

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Functions;
 
@@ -9,41 +10,6 @@ namespace JsonECore.Functions;
 /// </summary>
 public static class UtilityFunctions
 {
-    private static JsonElement CreateArray(List<int> items)
-    {
-        var json = JsonSerializer.Serialize(items);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static JsonElement CreateBool(bool value)
-    {
-        using var doc = JsonDocument.Parse(value ? "true" : "false");
-        return doc.RootElement.Clone();
-    }
-
-    private static JsonElement CreateString(string value)
-    {
-        var json = JsonSerializer.Serialize(value);
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.Clone();
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
-    }
-
     public class RangeFunction : IBuiltInFunction
     {
         public string Name => "range";
@@ -60,20 +26,20 @@ public static class UtilityFunctions
             if (args.Count == 1)
             {
                 start = 0;
-                end = GetInt(args[0], Name);
+                end = GetIntArg(args[0], Name);
                 step = 1;
             }
             else if (args.Count == 2)
             {
-                start = GetInt(args[0], Name);
-                end = GetInt(args[1], Name);
+                start = GetIntArg(args[0], Name);
+                end = GetIntArg(args[1], Name);
                 step = 1;
             }
             else
             {
-                start = GetInt(args[0], Name);
-                end = GetInt(args[1], Name);
-                step = GetInt(args[2], Name);
+                start = GetIntArg(args[0], Name);
+                end = GetIntArg(args[1], Name);
+                step = GetIntArg(args[2], Name);
             }
 
             if (step == 0)
@@ -100,7 +66,7 @@ public static class UtilityFunctions
             return CreateArray(result);
         }
 
-        private static int GetInt(JsonElement value, string funcName)
+        private static int GetIntArg(JsonElement value, string funcName)
         {
             if (value.ValueKind != JsonValueKind.Number)
             {

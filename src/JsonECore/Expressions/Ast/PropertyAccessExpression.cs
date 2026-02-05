@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JsonECore.Context;
+using static JsonECore.JsonElementHelper;
 
 namespace JsonECore.Expressions.Ast;
 
@@ -21,31 +22,12 @@ public class PropertyAccessExpression : IExpression
     {
         var obj = Object.Evaluate(context);
 
-        if (obj.ValueKind != JsonValueKind.Object)
-        {
+        if (!IsObject(obj))
             throw new JsonEException(JsonEErrorCodes.TypeMismatch, $"Cannot access property '{PropertyName}' on non-object", "object", GetTypeName(obj));
-        }
 
         if (obj.TryGetProperty(PropertyName, out var value))
-        {
             return value.Clone();
-        }
 
         throw new JsonEException(JsonEErrorCodes.UndefinedVariable, $"Property '{PropertyName}' not found", PropertyName);
-    }
-
-    private static string GetTypeName(JsonElement value)
-    {
-        return value.ValueKind switch
-        {
-            JsonValueKind.Null => "null",
-            JsonValueKind.True => "boolean",
-            JsonValueKind.False => "boolean",
-            JsonValueKind.Number => "number",
-            JsonValueKind.String => "string",
-            JsonValueKind.Array => "array",
-            JsonValueKind.Object => "object",
-            _ => "undefined"
-        };
     }
 }

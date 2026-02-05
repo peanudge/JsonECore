@@ -88,7 +88,6 @@ public static class JsonE
 
         // Check for $-escaped keys
         var result = new Dictionary<string, JsonElement>();
-        bool hasDeletedKeys = false;
 
         foreach (var prop in template.EnumerateObject())
         {
@@ -141,10 +140,6 @@ public static class JsonE
                 {
                     result[actualKey] = RenderInternal(elseValue, context);
                 }
-                else
-                {
-                    hasDeletedKeys = true;
-                }
                 continue;
             }
 
@@ -153,7 +148,6 @@ public static class JsonE
             // Skip if the value should be deleted (from $if without else)
             if (IsDeleteMarker(renderedValue))
             {
-                hasDeletedKeys = true;
                 continue;
             }
 
