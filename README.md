@@ -151,9 +151,39 @@ JsonECore/
 
 - .NET 8.0 SDK
 
-## Reference
+## References
 
-Based on the [JSON-E specification](https://github.com/json-e/json-e).
+### JSON-E Specification
+This implementation is based on the official JSON-E specification:
+
+- **Official Repository**: https://github.com/json-e/json-e
+- **Specification YAML**: https://github.com/json-e/json-e/blob/main/specification.yml
+- **Documentation**: https://json-e.js.org/
+
+### What is JSON-E?
+JSON-E is a data-structure parameterization system for embedding context in JSON objects. It is designed to be:
+
+- **Safe**: No arbitrary code execution
+- **Deterministic**: Same input always produces same output
+- **Language-agnostic**: Implementations available in multiple languages
+
+### Other Implementations
+| Language | Repository |
+|----------|------------|
+| JavaScript | https://github.com/json-e/json-e (reference) |
+| Python | https://github.com/json-e/json-e |
+| Go | https://github.com/json-e/json-e |
+| Rust | https://github.com/aspect-build/rules_py |
+
+### Use Cases
+- **Configuration Management**: Generate environment-specific configs
+- **CI/CD Pipelines**: Dynamic task definitions (used by Taskcluster)
+- **API Responses**: Template-based response generation
+- **Data Transformation**: ETL and data processing pipelines
+
+### Related Projects
+- **Taskcluster**: https://taskcluster.net/ - Mozilla's task execution framework that uses JSON-E
+- **JSON Schema**: https://json-schema.org/ - Complementary for validation
 
 ## License
 
