@@ -1,0 +1,22 @@
+{
+  "defaults": {
+    "server": {
+      "host": "localhost",
+      "port": 8080,
+      "timeout": 30
+    },
+    "logging": {
+      "level": "info",
+      "format": "json"
+    }
+  },
+  "overrides": {
+    "server": {
+      "host": "production.example.com",
+      "port": 443
+    },
+    "logging": {
+      "level": "warn"
+    }
+  }
+}

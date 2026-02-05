@@ -1,0 +1,8 @@
+{
+  "config": {
+    "$mergeDeep": [
+      { "$eval": "defaults" },
+      { "$eval": "overrides" }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "doubled": {
+    "$map": { "$eval": "numbers" },
+    "each(x)": { "$eval": "x * 2" }
+  },
+  "sum": {
+    "$reduce": { "$eval": "numbers" },
+    "each(acc, x)": { "$eval": "acc + x" },
+    "initial": 0
+  },
+  "firstEven": {
+    "$find": { "$eval": "numbers" },
+    "each(x)": "x % 2 == 0"
+  },
+  "sorted": {
+    "$sort": { "$eval": "numbers" }
+  },
+  "reversed": {
+    "$reverse": { "$eval": "numbers" }
+  }
+}

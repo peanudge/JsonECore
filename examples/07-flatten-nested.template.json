@@ -1,0 +1,9 @@
+{
+  "original": { "$eval": "nested" },
+  "flattenOnce": {
+    "$flatten": { "$eval": "nested" }
+  },
+  "flattenDeep": {
+    "$flattenDeep": { "$eval": "nested" }
+  }
+}

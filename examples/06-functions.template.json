@@ -1,0 +1,29 @@
+{
+  "math": {
+    "min": { "$eval": "min(10, 5, 8, 3)" },
+    "max": { "$eval": "max(10, 5, 8, 3)" },
+    "sqrt": { "$eval": "sqrt(16)" },
+    "abs": { "$eval": "abs(-42)" },
+    "ceil": { "$eval": "ceil(3.2)" },
+    "floor": { "$eval": "floor(3.8)" }
+  },
+  "strings": {
+    "upper": { "$eval": "uppercase(text)" },
+    "lower": { "$eval": "lowercase(text)" },
+    "stripped": { "$eval": "strip(padded)" },
+    "words": { "$eval": "split(text, ' ')" },
+    "joined": { "$eval": "join(['a', 'b', 'c'], '-')" }
+  },
+  "types": {
+    "textType": { "$eval": "typeof(text)" },
+    "numType": { "$eval": "typeof(42)" },
+    "textLen": { "$eval": "len(text)" },
+    "numToStr": { "$eval": "str(123)" },
+    "strToNum": { "$eval": "number('456')" }
+  },
+  "ranges": {
+    "simple": { "$eval": "range(5)" },
+    "startEnd": { "$eval": "range(2, 7)" },
+    "withStep": { "$eval": "range(0, 10, 2)" }
+  }
+}

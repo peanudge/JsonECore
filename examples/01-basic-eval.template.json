@@ -1,0 +1,5 @@
+{
+  "sum": { "$eval": "a + b" },
+  "product": { "$eval": "a * b" },
+  "power": { "$eval": "a ** 2" }
+}

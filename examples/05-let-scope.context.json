@@ -1,0 +1,7 @@
+{
+  "cart": [
+    { "name": "Book", "price": 20 },
+    { "name": "Pen", "price": 5 },
+    { "name": "Notebook", "price": 15 }
+  ]
+}

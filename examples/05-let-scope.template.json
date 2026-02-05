@@ -1,0 +1,32 @@
+{
+  "$let": {
+    "tax_rate": 0.1,
+    "discount": 0.15
+  },
+  "in": {
+    "items": {
+      "$map": { "$eval": "cart" },
+      "each(item)": {
+        "name": { "$eval": "item.name" },
+        "originalPrice": { "$eval": "item.price" },
+        "discountedPrice": { "$eval": "item.price * (1 - discount)" },
+        "finalPrice": { "$eval": "item.price * (1 - discount) * (1 + tax_rate)" }
+      }
+    },
+    "summary": {
+      "$let": {
+        "subtotal": {
+          "$reduce": { "$eval": "cart" },
+          "each(acc, item)": { "$eval": "acc + item.price" },
+          "initial": 0
+        }
+      },
+      "in": {
+        "subtotal": { "$eval": "subtotal" },
+        "discount": { "$eval": "subtotal * discount" },
+        "tax": { "$eval": "(subtotal - subtotal * discount) * tax_rate" },
+        "total": { "$eval": "subtotal * (1 - discount) * (1 + tax_rate)" }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "greeting": {
+    "$if": "user.isAdmin",
+    "then": "Welcome, Administrator ${user.name}!",
+    "else": "Hello, ${user.name}!"
+  },
+  "accessLevel": {
+    "$switch": {
+      "user.role == 'admin'": "full",
+      "user.role == 'editor'": "write",
+      "user.role == 'viewer'": "read",
+      "$default": "none"
+    }
+  }
+}
